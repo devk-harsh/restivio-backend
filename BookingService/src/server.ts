@@ -1,5 +1,6 @@
 import express from 'express';
 import { serverConfig } from './config';
+import './db/models/associations';
 import v1Router from './routers/V1/index.router';
 import v2Router from './routers/V2/index.router';
 import { appErrorHandler, genericErrorHandler } from './middlewares/error.middleware';

@@ -55,9 +55,6 @@ export async function confirmBookingService(idemKey: string) {
   try {
     const idempotencyKey = await getIdempotencyKeyWithLock(idemKey, transaction);
 
-    // Simulate a delay to test concurrent requests with the same idempotency key
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-
     if (!idempotencyKey) {
       throw new NotFoundError("Idempotency key not found");
     }

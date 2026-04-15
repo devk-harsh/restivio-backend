@@ -46,6 +46,23 @@ export const validateQueryParams = (schema: ZodObject)=>{
     }
 }
 
+export const validateRequestParams = (schema: ZodObject) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            logger.info("Validating route params");
+            await schema.parseAsync(req.params);
+            logger.info("Route params are valid");
+            next();
+        } catch (error) {
+            logger.error("Route params are invalid");
+            res.status(400).json({
+                message: "Invalid route params",
+                success: false,
+                error: error
+            });
+        }
+    };
+};
 /*
 
                                 You can even do this 

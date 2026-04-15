@@ -6,3 +6,7 @@ export const createBookingSchema = z.object({
   bookingAmount: z.number().positive(),
   totalGuests: z.number().int().positive()
 });
+
+export const confirmBookingParamsSchema = z.object({
+  idempotencyKey: z.string().uuid()
+});

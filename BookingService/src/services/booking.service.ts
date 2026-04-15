@@ -1,7 +1,7 @@
 import logger from "../config/logger.config";
 import { CreateBookingDTO } from "../dtos/booking.dto";
 import sequelize from "../db/models/sequelize";
-import { createBooking, confirmBooking} from "../repositories/booking.repository";
+import { createBooking, confirmBooking, getBookingById} from "../repositories/booking.repository";
 import { 
     createIdempotencyKey,
     getIdempotencyKeyWithLock,
@@ -81,4 +81,14 @@ export async function confirmBookingService(idemKey: string) {
     logger.error("Transaction rolled back while confirming booking");
     throw error;
   }
+}
+
+export async function getBookingByIdService(bookingId: number) {
+  const booking = await getBookingById(bookingId);
+
+  if (!booking) {
+    throw new NotFoundError("Booking not found");
+  }
+
+  return booking;
 }

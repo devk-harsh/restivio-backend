@@ -42,3 +42,8 @@ export async function confirmBooking(
   logger.info(`Booking confirmed with ID: ${bookingId}`);
   return booking;
 }
+
+export async function getBookingById(bookingId: number) {
+  const booking = await Booking.findByPk(bookingId);
+  return booking;
+}

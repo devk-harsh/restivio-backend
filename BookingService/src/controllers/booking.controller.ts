@@ -4,7 +4,8 @@ import logger from "../config/logger.config";
 import { CreateBookingDTO } from "../dtos/booking.dto";
 import { 
   createBookingService,
-  confirmBookingService
+  confirmBookingService,
+  getBookingByIdService
  } from "../services/booking.service";
 import { BadRequestError } from "../utils/errors/app.error";
 
@@ -37,11 +38,25 @@ export async function confirmBookingHandler(req: Request, res: Response) {
 
   const booking = await confirmBookingService(idempotencyKey);
 
-  logger.info(`Booking controller confirmed booking with ID: ${booking?.id}`);
+  logger.info(`Booking controller confirmed booking with ID: ${booking.id}`);
 
   return res.status(StatusCodes.OK).json({
     success: true,
     message: "Booking confirmed successfully",
+    data: booking
+  });
+}
+
+export async function getBookingByIdHandler(req: Request, res: Response) {
+  const bookingId = Number(req.params.id);
+
+  const booking = await getBookingByIdService(bookingId);
+
+  logger.info(`Booking controller fetched booking with ID: ${booking.id}`);
+
+  return res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Booking fetched successfully",
     data: booking
   });
 }

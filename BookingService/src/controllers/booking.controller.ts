@@ -5,7 +5,8 @@ import { CreateBookingDTO } from "../dtos/booking.dto";
 import { 
   createBookingService,
   confirmBookingService,
-  getBookingByIdService
+  getBookingByIdService,
+  cancelBookingService
  } from "../services/booking.service";
 import { BadRequestError } from "../utils/errors/app.error";
 
@@ -57,6 +58,20 @@ export async function getBookingByIdHandler(req: Request, res: Response) {
   return res.status(StatusCodes.OK).json({
     success: true,
     message: "Booking fetched successfully",
+    data: booking
+  });
+}
+
+export async function cancelBookingHandler(req: Request, res: Response) {
+  const bookingId = Number(req.params.id);
+
+  const booking = await cancelBookingService(bookingId);
+
+  logger.info(`Booking controller cancelled booking with ID: ${booking.id}`);
+
+  return res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Booking cancelled successfully",
     data: booking
   });
 }

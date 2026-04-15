@@ -10,3 +10,7 @@ export const createBookingSchema = z.object({
 export const confirmBookingParamsSchema = z.object({
   idempotencyKey: z.string().uuid()
 });
+
+export const cancelBookingParamsSchema = z.object({
+  id: z.coerce.number().int().positive()
+});

@@ -1,12 +1,17 @@
 import logger from "../config/logger.config";
 import { CreateBookingDTO } from "../dtos/booking.dto";
 import sequelize from "../db/models/sequelize";
-import { createBooking, confirmBooking, getBookingById} from "../repositories/booking.repository";
+import { 
+    createBooking,
+    confirmBooking,
+    getBookingById,
+    cancelBooking
+  } from "../repositories/booking.repository";
 import { 
     createIdempotencyKey,
     getIdempotencyKeyWithLock,
     finalizeIdempotencyKey
- } from "../repositories/idempotency.repository";
+  } from "../repositories/idempotency.repository";
 import { generateIdempotencyKey } from "../utils/helpers/idempotency.helper";
 import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
 
@@ -91,4 +96,24 @@ export async function getBookingByIdService(bookingId: number) {
   }
 
   return booking;
+}
+
+export async function cancelBookingService(bookingId: number) {
+  const existingBooking = await getBookingById(bookingId);
+
+  if (!existingBooking) {
+    throw new NotFoundError("Booking not found");
+  }
+
+  if (existingBooking.status === "CANCELLED") {
+    throw new BadRequestError("Booking is already cancelled");
+  }
+
+  const cancelledBooking = await cancelBooking(bookingId);
+
+  if (!cancelledBooking) {
+    throw new NotFoundError("Booking not found");
+  }
+
+  return cancelledBooking;
 }

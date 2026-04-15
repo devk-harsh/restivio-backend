@@ -4,7 +4,7 @@ import sequelize from "../db/models/sequelize";
 import { createBooking, confirmBooking} from "../repositories/booking.repository";
 import { 
     createIdempotencyKey,
-    getIdempotencyKey,
+    getIdempotencyKeyWithLock,
     finalizeIdempotencyKey
  } from "../repositories/idempotency.repository";
 import { generateIdempotencyKey } from "../utils/helpers/idempotency.helper";
@@ -53,7 +53,10 @@ export async function confirmBookingService(idemKey: string) {
   const transaction = await sequelize.transaction();
 
   try {
-    const idempotencyKey = await getIdempotencyKey(idemKey, transaction);
+    const idempotencyKey = await getIdempotencyKeyWithLock(idemKey, transaction);
+
+    // Simulate a delay to test concurrent requests with the same idempotency key
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     if (!idempotencyKey) {
       throw new NotFoundError("Idempotency key not found");

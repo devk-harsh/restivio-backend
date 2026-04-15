@@ -1,6 +1,8 @@
 import logger from "../config/logger.config";
 import IdempotencyKey from "../db/models/idempotencyKey";
 import { Transaction } from "sequelize";
+import {validate as isValidUUID} from "uuid";
+import { NotFoundError } from "../utils/errors/app.error";
 
 interface CreateIdempotencyKeyRepositoryDTO {
   idemKey: string;
@@ -17,14 +19,23 @@ export async function createIdempotencyKey(
   return idempotencyKey;
 }
 
-export async function getIdempotencyKey(
+export async function getIdempotencyKeyWithLock(
   idemKey: string,
   transaction: Transaction
 ) {
+  if (!isValidUUID(idemKey)) {
+    logger.error(`Invalid idempotency key format: ${idemKey}`);
+    throw new Error("Invalid idempotency key format");
+  }
   const idempotencyKey = await IdempotencyKey.findOne({
     where: { idemKey },
-    transaction
+    transaction,
+    lock: transaction.LOCK.UPDATE
   });
+
+  if(!idempotencyKey) {
+    throw new NotFoundError("Idempotency key not found");
+  }
   return idempotencyKey;
 }
 

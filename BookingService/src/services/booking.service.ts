@@ -30,9 +30,6 @@ export async function createBookingService(bookingData: CreateBookingDTO) {
     lock = await redlock.lock(bookingResource, serverConfig.LOCK_TTL);
 
     logger.info(`Redis lock acquired on ${bookingResource}`);
-    
-    // Simulate some processing delay to test lock behavior
-    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     const transaction = await sequelize.transaction();
     try {

@@ -14,44 +14,73 @@ import {
   } from "../repositories/idempotency.repository";
 import { generateIdempotencyKey } from "../utils/helpers/idempotency.helper";
 import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
+import { redlock } from "../config/redis.config";
+import { serverConfig } from "../config";
+import Redlock from "redlock";
+
 
 
 export async function createBookingService(bookingData: CreateBookingDTO) {
-  const transaction = await sequelize.transaction();
+  const bookingResource = `hotel:${bookingData.hotelId}`;
+  let lock: Redlock.Lock | null = null;
+
   try {
-    const booking = await createBooking(
-      {
-        ...bookingData,
-        status: "PENDING" as const
-      },
-      transaction
-    );
+    logger.info(`Trying to acquire Redis lock on ${bookingResource}`);
 
-    //throw new Error("Forcing rollback after booking creation"); (to test transaction rollback)
-    const idemKey = generateIdempotencyKey();
-    await createIdempotencyKey(
-      {
-        idemKey,
-        bookingId: booking.id,
-        finalized: false
-      },
-      transaction
-    );
-    await transaction.commit();
+    lock = await redlock.lock(bookingResource, serverConfig.LOCK_TTL);
 
-    logger.info(
-      `Booking service created booking ${booking.id} with idempotency key ${idemKey}`
-    );
-    return {
-      booking,
-      idemKey
-    };
+    logger.info(`Redis lock acquired on ${bookingResource}`);
+    
+    // Simulate some processing delay to test lock behavior
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
+    const transaction = await sequelize.transaction();
+    try {
+      const booking = await createBooking(
+        {
+          ...bookingData,
+          status: "PENDING" as const
+        },
+        transaction
+      );
+
+      const idemKey = generateIdempotencyKey();
+      await createIdempotencyKey(
+        {
+          idemKey,
+          bookingId: booking.id,
+          finalized: false
+        },
+        transaction
+      );
+      await transaction.commit();
+
+      logger.info(
+        `Booking service created booking ${booking.id} with idempotency key ${idemKey}`
+      );
+      return {
+        booking,
+        idemKey
+      };
+
+    } catch (error) {
+      await transaction.rollback();
+      logger.error("Transaction rolled back while creating booking");
+      throw error;
+    }
   } catch (error) {
-    await transaction.rollback();
-    logger.error("Transaction rolled back while creating booking");
+    logger.error("Failed to acquire Redis lock for booking creation");
     throw error;
-  }
+  } finally {
+      if (lock) {
+        try {
+          await lock.unlock();
+          logger.info(`Redis lock released on ${bookingResource}`);
+        } catch (error) {
+          logger.error(`Failed to release Redis lock on ${bookingResource}`);
+        }
+      }
+    }
 }
 
 export async function confirmBookingService(idemKey: string) {

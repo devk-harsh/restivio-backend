@@ -4,6 +4,14 @@ import { serverConfig } from ".";
 
 export const redisClient = new IORedis(serverConfig.REDIS_SERVER_URL);
 
+redisClient.on("connect", () => {
+  console.log("Connected to Redis");
+});
+
+redisClient.on("error", (error) => {
+  console.error("Redis connection error:", error);
+});
+
 export const redlock = new Redlock(
   [redisClient],
   {

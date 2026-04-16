@@ -7,6 +7,9 @@ import { appErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import sequelize from './db/models/sequelize';
+import { redisClient } from './config/redis.config';
+
+
 const app = express();
 
 app.use(express.json());
@@ -24,6 +27,13 @@ const startServer = async () => {
     try {
         await sequelize.authenticate();
         logger.info('Database connection has been established successfully.');
+
+        const pong = await redisClient.ping();
+        logger.info(`Redis connection successful: ${pong}`);
+
+        await redisClient.set("test:key", "hello");
+        const value = await redisClient.get("test:key");
+        logger.info(`Redis test value: ${value}`);
 
         app.listen(serverConfig.PORT, () => {
             logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);

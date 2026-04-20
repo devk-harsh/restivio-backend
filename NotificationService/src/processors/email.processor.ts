@@ -3,6 +3,8 @@ import logger from "../config/logger.config";
 import { redisConnection } from "../config/redis.config";
 import { EmailJobPayload } from "../types/email.types";
 import { EMAIL_JOB_NAME, MAILER_QUEUE_NAME } from "../queues/mailer.queue";
+import { renderMailTemplate } from "../templates/template.handler";
+import { sendEmail } from "../services/mailer.service";
 
 let workerInstance : Worker<EmailJobPayload> | null = null;
 
@@ -24,8 +26,25 @@ export function setupMailerWorker() {
                 jobName: job.name,
                 payload,
             });
+            // return {
+            //     message: "Email job consumed successfully",
+            //     to: payload.to,
+            //     templateId: payload.templateId,
+            // };
+
+            const html = await renderMailTemplate(
+                payload.templateId,
+                payload.params
+            );
+
+            await sendEmail({
+                to: payload.to,
+                subject: payload.subject,
+                html,
+            });
+
             return {
-                message: "Email job consumed successfully",
+                message: "Email sent successfully",
                 to: payload.to,
                 templateId: payload.templateId,
             };

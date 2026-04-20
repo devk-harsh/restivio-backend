@@ -6,6 +6,7 @@ import v2Router from './routers/V2/index.router';
 import { genericErrorHandler } from './middlewares/error.middleware';
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
+import { setupMailerWorker } from './processors/email.processor';
 
 const app = express();
 
@@ -29,7 +30,10 @@ app.use(genericErrorHandler);
 
 app.listen(serverConfig.PORT, ()=>{
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}/api/v1/ping`);
-    logger.info(`Server is running on http://localhost:${serverConfig.PORT}/api/v2/ping`);
+
+    setupMailerWorker();
+    logger.info("Mailer worker started");
+    
     logger.info(`Press Ctrl +C to stop the server`,{"name":"dev servers"});
 
 });

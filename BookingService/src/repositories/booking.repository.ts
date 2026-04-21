@@ -4,6 +4,7 @@ import { Transaction } from "sequelize";
 
 interface CreateBookingRepositoryDTO {
   userId: number;
+  userEmail: string;
   hotelId: number;
   bookingAmount: number;
   totalGuests: number;

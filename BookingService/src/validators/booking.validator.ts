@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const createBookingSchema = z.object({
   userId: z.number(),
+  userEmail: z.email(),
   hotelId: z.number(),
   bookingAmount: z.number().positive(),
   totalGuests: z.number().int().positive()

@@ -13,6 +13,7 @@ import { BadRequestError } from "../utils/errors/app.error";
 export async function createBookingHandler(req: Request, res: Response) {
   const bookingData: CreateBookingDTO = {
     userId: req.body.userId,
+    userEmail: req.body.userEmail,
     hotelId: req.body.hotelId,
     bookingAmount: req.body.bookingAmount,
     totalGuests: req.body.totalGuests

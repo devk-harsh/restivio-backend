@@ -17,11 +17,11 @@ import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
 import { redlock } from "../config/redis.config";
 import { serverConfig } from "../config";
 import Redlock from "redlock";
-
+import { sendBookingConfirmedNotification } from "./notification.service";
 
 
 export async function createBookingService(bookingData: CreateBookingDTO) {
-  const bookingResource = `hotel:${bookingData.hotelId}`;
+  const bookingResource = `lock:hotel:${bookingData.hotelId}`;
   let lock: Redlock.Lock | null = null;
 
   try {
@@ -82,7 +82,7 @@ export async function createBookingService(bookingData: CreateBookingDTO) {
 
 export async function confirmBookingService(idemKey: string) {
   const transaction = await sequelize.transaction();
-
+  let booking;
   try {
     const idempotencyKey = await getIdempotencyKeyWithLock(idemKey, transaction);
 
@@ -94,7 +94,7 @@ export async function confirmBookingService(idemKey: string) {
       throw new BadRequestError("Idempotency key already finalized");
     }
 
-    const booking = await confirmBooking(idempotencyKey.bookingId, transaction);
+    booking = await confirmBooking(idempotencyKey.bookingId, transaction);
 
     if (!booking) {
       throw new NotFoundError("Booking not found");
@@ -105,14 +105,20 @@ export async function confirmBookingService(idemKey: string) {
     await transaction.commit();
 
     logger.info(`Booking confirmed successfully for key ${idemKey}`);
-
-    return booking;
   } catch (error) {
     await transaction.rollback();
     logger.error("Transaction rolled back while confirming booking");
     throw error;
   }
-}
+  await sendBookingConfirmedNotification({
+      to: booking.userEmail,
+      bookingId: booking.id,
+      hotelId: booking.hotelId,
+      totalGuests: booking.totalGuests,
+      bookingAmount: booking.bookingAmount,
+  });
+  return booking;
+  } 
 
 export async function getBookingByIdService(bookingId: number) {
   const booking = await getBookingById(bookingId);

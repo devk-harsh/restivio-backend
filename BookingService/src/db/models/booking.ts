@@ -14,6 +14,7 @@ class Booking extends Model<
 > {
     declare id: CreationOptional<number>;
     declare userId: number;
+    declare userEmail: string;
     declare hotelId: number;
     declare bookingAmount: number;
     declare status: "PENDING" | "CONFIRMED" | "CANCELLED";
@@ -32,6 +33,10 @@ Booking.init( //actual mapping
         },
         userId: {
             type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+        },
+        userEmail: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
         hotelId: {

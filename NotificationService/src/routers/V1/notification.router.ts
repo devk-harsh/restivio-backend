@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { queueEmailNotification } from "../../controllers/notification.controller";
+import { queueEmailNotificationHandler } from "../../controllers/notification.controller";
+import { validateRequestBody } from "../../validators";
+import { queueEmailNotificationSchema } from "../../validators/notification.validator";
+const notificationRouter = Router();
 
-const router = Router();
-
-router.post("/email", queueEmailNotification);
-
-export default router;
+notificationRouter.post("/email", validateRequestBody(queueEmailNotificationSchema), queueEmailNotificationHandler);
+export default notificationRouter;

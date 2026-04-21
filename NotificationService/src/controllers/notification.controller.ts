@@ -3,28 +3,19 @@ import logger from "../config/logger.config";
 import { addEmailToQueue } from "../producers/email.producer";
 import { EmailJobPayload } from "../types/email.types";
 
-export async function queueEmailNotification(req: Request, res: Response) {
-  const { to, subject, templateId, params } = req.body as EmailJobPayload;
-
-  if (!to || !subject || !templateId) {
-    return res.status(400).json({
-      success: false,
-      message: "to, subject and templateId are required",
-    });
-  }
+export async function queueEmailNotificationHandler(req: Request, res: Response) {
+  const payload = req.body as EmailJobPayload;
 
   const job = await addEmailToQueue({
-    to,
-    subject,
-    templateId,
-    params: params || {},
+    ...payload,
+    params: payload.params || {},
   });
 
   logger.info("Email job added to queue", {
     jobId: job.id,
     jobName: job.name,
-    to,
-    templateId,
+    to: payload.to,
+    templateId: payload.templateId,
   });
 
   return res.status(202).json({

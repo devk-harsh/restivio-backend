@@ -7,7 +7,7 @@ export async function addEmailToQueue(payload:EmailJobPayload) {
         backoff: {
             type: "fixed",
             delay: 5000, // 5 seconds,
-            jitter: 1000, // Add up to 1 second of random jitter to helps avoid many failed jobs retrying at exactly the same moment.
+            jitter: 0.5, // Add random jitter to helps avoid many failed jobs retrying at exactly the same moment.
         },
         removeOnComplete: true,
         removeOnFail: false,

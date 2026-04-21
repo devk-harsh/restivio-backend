@@ -17,7 +17,7 @@ import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
 import { redlock } from "../config/redis.config";
 import { serverConfig } from "../config";
 import Redlock from "redlock";
-import { sendBookingConfirmedNotification } from "./notification.service";
+import { sendBookingConfirmedNotification, sendBookingCancelledNotification } from "./notification.service";
 
 
 export async function createBookingService(bookingData: CreateBookingDTO) {
@@ -146,6 +146,16 @@ export async function cancelBookingService(bookingId: number) {
   if (!cancelledBooking) {
     throw new NotFoundError("Booking not found");
   }
+
+  await sendBookingCancelledNotification({
+    to: cancelledBooking.userEmail,
+    bookingId: cancelledBooking.id,
+    hotelId: cancelledBooking.hotelId,
+    totalGuests: cancelledBooking.totalGuests,
+    bookingAmount: cancelledBooking.bookingAmount,
+  });
+
+  logger.info(`Booking cancelled successfully for booking ID ${bookingId}`);
 
   return cancelledBooking;
 }

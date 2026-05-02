@@ -11,5 +11,5 @@ export type updateHotelDTO = {
     address?: string;
     location?: string;
     rating?: number;
-    ratingCount?: number;
+    rating_Count?: number;
 };

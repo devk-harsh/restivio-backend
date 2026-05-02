@@ -6,6 +6,8 @@ import { appErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import logger from './config/logger.config';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import sequelize from './db/models/sequelize';
+import "./db/models/associations";
+
 const app = express();
 
 app.use(express.json());

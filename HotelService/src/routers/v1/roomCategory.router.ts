@@ -1,10 +1,18 @@
 import express from "express";
-import {createRoomCategoryHandler, getRoomCategoriesByHotelHandler,
+import {
+  createRoomCategoryHandler,
+  getRoomCategoriesByHotelHandler,
+  updateRoomCategoryHandler,
+  deleteRoomCategoryHandler,
 } from "../../controllers/roomCategory.controller";
 
 import {validatePathParams, validateRequestBody,
 } from "../../validators";
-import {createRoomCategorySchema, roomCategoryHotelParamsSchema,
+import {
+  createRoomCategorySchema,
+  updateRoomCategorySchema,
+  roomCategoryHotelParamsSchema,
+  roomCategoryParamsSchema,
 } from "../../validators/roomCategory.validator";
 
 const roomCategoryRouter = express.Router({
@@ -22,6 +30,19 @@ roomCategoryRouter.get(
   "/",
   validatePathParams(roomCategoryHotelParamsSchema),
   getRoomCategoriesByHotelHandler
+);
+
+roomCategoryRouter.patch(
+  "/:roomCategoryId",
+  validatePathParams(roomCategoryParamsSchema),
+  validateRequestBody(updateRoomCategorySchema),
+  updateRoomCategoryHandler
+);
+
+roomCategoryRouter.delete(
+  "/:roomCategoryId",
+  validatePathParams(roomCategoryParamsSchema),
+  deleteRoomCategoryHandler
 );
 
 export default roomCategoryRouter;

@@ -5,3 +5,9 @@ export type CreateRoomCategoryDTO = {
     price: number;
     roomCount: number;
 };
+
+export type UpdateRoomCategoryDTO = {
+    //roomType?: RoomType; roomType is identity-like configuration. Once created, we keep it immutable.
+    price?: number;
+    roomCount?: number;
+};

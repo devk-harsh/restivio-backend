@@ -19,6 +19,33 @@ export const createRoomCategorySchema = z
   })
   .strict();
 
+export const updateRoomCategorySchema = z
+  .object({
+    price: z
+      .number()
+      .int()
+      .positive()
+      .optional(),
+
+    roomCount: z
+      .number()
+      .int()
+      .positive()
+      .optional(),
+  })
+  .strict()
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    {
+      message: "At least one field must be provided for update",
+    }
+  );
+
 export const roomCategoryHotelParamsSchema = z.object({
   hotelId: positiveIntegerString,
+});
+
+export const roomCategoryParamsSchema = z.object({
+  hotelId: positiveIntegerString,
+  roomCategoryId: positiveIntegerString,
 });

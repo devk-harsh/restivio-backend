@@ -31,10 +31,6 @@ const startServer = async () => {
         const pong = await redisClient.ping();
         logger.info(`Redis connection successful: ${pong}`);
 
-        await redisClient.set("test:key", "hello");
-        const value = await redisClient.get("test:key");
-        logger.info(`Redis test value: ${value}`);
-
         app.listen(serverConfig.PORT, () => {
             logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
             logger.info(`Press Ctrl+C to stop the server.`);

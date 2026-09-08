@@ -22,8 +22,8 @@ type ServerConfig = {
 };
 
 export const serverConfig: ServerConfig= {
-    PORT : Number(process.env.PORT) || 3001,
-    API_VERSION : String(process.env.API_VERSION),
+    PORT : Number(process.env.PORT) || 3003,
+    API_VERSION : process.env.API_VERSION || "v1",
 
     REDIS_HOST: process.env.REDIS_HOST || "127.0.0.1",
     REDIS_PORT: Number(process.env.REDIS_PORT) || 6379,

@@ -31,7 +31,7 @@ export const serverConfig: ServerConfig = {
 export const dbConfig: DbConfig = {
   DB_USER: process.env.DB_USER || "root",
   DB_PASSWORD: process.env.DB_PASSWORD || "root",
-  DB_NAME: process.env.DB_NAME || "test_db",
+  DB_NAME: process.env.DB_NAME || "restivio_hotel",
   DB_HOST: process.env.DB_HOST || "localhost",
   DB_PORT: Number(process.env.DB_PORT) || 3306,
 };

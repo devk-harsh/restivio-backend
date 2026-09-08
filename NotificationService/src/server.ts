@@ -16,14 +16,9 @@ app.use(express.json());
 app.use(attachCorrelationIdMiddleware);
 
 
-/*
-Registering all the routers and their corresponding routes without app server object
-*/
 app.use('/api/v1', v1Router);
 app.use('/api/v2', v2Router);
-//This is API Versioning..And one version is down then just comment down their app.use
 
-//Now add the error handler middleware
 app.use(genericErrorHandler);
 
 

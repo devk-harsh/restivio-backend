@@ -15,8 +15,8 @@ class Hotel extends Model<
   declare name: string;
   declare address: string;
   declare location: string;
-  declare rating: number;
-  declare rating_count: number;
+  declare rating: CreationOptional<number | null>;
+  declare ratingCount: CreationOptional<number | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare deletedAt: CreationOptional<Date | null>;
@@ -48,11 +48,14 @@ Hotel.init( //actual mapping
     rating: {
       type: DataTypes.DECIMAL(3, 2),
       allowNull: true,
+      defaultValue: null,
     },
 
-    rating_count: {
+    ratingCount: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: null,
+      field: "rating_count",
     },
 
     createdAt: {

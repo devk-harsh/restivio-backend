@@ -6,6 +6,8 @@ import {
   deleteRoomCategoryHandler,
 } from "../../controllers/roomCategory.controller";
 
+import {generateRoomInventoryHandler,} from "../../controllers/roomGeneration.controller";
+
 import {validatePathParams, validateRequestBody,
 } from "../../validators";
 import {
@@ -14,6 +16,8 @@ import {
   roomCategoryHotelParamsSchema,
   roomCategoryParamsSchema,
 } from "../../validators/roomCategory.validator";
+
+import {generateRoomInventorySchema,} from "../../validators/roomGeneration.validator";
 
 const roomCategoryRouter = express.Router({
   mergeParams: true,
@@ -43,6 +47,20 @@ roomCategoryRouter.delete(
   "/:roomCategoryId",
   validatePathParams(roomCategoryParamsSchema),
   deleteRoomCategoryHandler
+);
+
+roomCategoryRouter.post(
+  "/:roomCategoryId/inventory/generate",
+
+  validatePathParams(
+    roomCategoryParamsSchema
+  ),
+
+  validateRequestBody(
+    generateRoomInventorySchema
+  ),
+
+  generateRoomInventoryHandler
 );
 
 export default roomCategoryRouter;
